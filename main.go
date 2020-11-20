@@ -90,6 +90,7 @@ func main() {
 
 	proxy := &httputil.ReverseProxy{
 		Director: func(r *http.Request) {
+			r.Header.Del("X-Forwarded-For")
 			r.URL.Scheme = "http"
 			r.URL.Host = r.Host
 		},

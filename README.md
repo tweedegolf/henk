@@ -1,19 +1,20 @@
-Henk is a very simple reverse https proxy leveraging openSSH's built-in reverse
-proxy features for authentication and secure tunneling.
+Henk is a very simple reverse HTTP proxy leveraging openSSH's built-in reverse
+proxy features for authentication and secure tunneling and Let's Encrypt for
+adding HTTPS.
 
 WARNING: Henk has not been reviewed for security, use at your own risk.
 
 ### Usage
 
-Once henk is set up, run the service you want to expose locally, for example on
-port 1111. Then use SSH to set up a reverse proxy:
+Once henk is set up, run the HTTP service you want to expose locally, for
+example on port 8080. Then use SSH to set up a reverse proxy:
 
-    ssh henk@tunnel.host.net -NR /run/henk/foobar:localhost:1111
+    ssh henk@tunnel.host.net -NR /run/henk/foobar:localhost:8080
 
 OpenSSH will create a proxy file on your server at `/run/henk/foobar` and
-forward its traffic to your localhost at port 1111. Henk will accept connections
+forward its traffic to your localhost at port 8080. Henk will accept connections
 on port 80 and 443 for foobar.tunnel.host.net, obtain a certificate if needed
-and proxy traffic to the proxy file. You can then:
+and proxy traffic to the proxy file. You can then access your service publicly:
 
     curl https://foobar.tunnel.host.net
 
