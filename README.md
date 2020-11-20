@@ -4,15 +4,15 @@ To run the daemon:
 
     henk tunnel.host.net
 
-It opens port 80 and 443 and mount /run/henk. DNS should be configured to point
+It opens port 80 and 443 and mounts /run/henk. DNS should be configured to point
 `*.tunnel.host.net` to the server it runs on.
 
 To forward https from foobar.tunnel.host.net to port 1111:
 
     ssh tunnel.host.net -R /run/henk/foobar:localhost:1111
 
-Henk detects the creation of this unix socket, obtain a certificate for
-foobar.tunnel.host.net and redirect traffic from https://foobar.tunnel.host.net
+Henk detects the creation of this unix socket, obtains a certificate for
+foobar.tunnel.host.net and redirects traffic from https://foobar.tunnel.host.net
 to it. You can now use the public endpoint, for example:
 
     curl https://foobar.tunnel.host.net

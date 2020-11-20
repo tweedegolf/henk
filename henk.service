@@ -1,0 +1,8 @@
+[Unit]
+Description=Henk reverse proxy daemon
+
+[Service]
+ExecStart=/usr/bin/henk
+RuntimeDirectoryMode=770
+User=henk
+Group=henk
