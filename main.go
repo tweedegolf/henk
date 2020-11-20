@@ -50,7 +50,7 @@ func main() {
 	if rundir == "" {
 		rundir = os.TempDir() + "/henk"
 	}
-	err := os.MkdirAll(rundir, 0775)
+	err := os.MkdirAll(rundir, 0755)
 	if err != nil {
 		panic(err)
 	}

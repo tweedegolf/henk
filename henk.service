@@ -2,7 +2,11 @@
 Description=Henk reverse proxy daemon
 
 [Service]
-ExecStart=/usr/bin/henk
-RuntimeDirectoryMode=770
+ExecStart=/usr/bin/henk .tunnel.host.net
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+RuntimeDirectory=henk
+RuntimeDirectoryMode=700
+RuntimeDirectoryPreserve=yes
+StateDirectory=henk
 User=henk
 Group=henk
