@@ -1,8 +1,8 @@
 Henk is a very simple reverse HTTP proxy leveraging OpenSSH's built-in reverse
-proxy features for authentication and secure tunneling and Let's Encrypt for
+proxy feature for authentication and secure tunneling and Let's Encrypt for
 adding HTTPS.
 
-WARNING: Henk has not been reviewed for security, use at your own risk.
+WARNING: Henk has not yet been thoroughly reviewed, use at your own risk.
 
 ### Usage
 
@@ -13,7 +13,7 @@ example on port 8080. Then use SSH to set up a reverse proxy:
 
 OpenSSH will create a proxy file on your server at `/run/henk/foobar` and
 forward its traffic to your localhost at port 8080. Henk will accept connections
-on port 80 and 443 for foobar.tunnel.host.net, obtain a certificate if needed
+on port 80 and 443 for `foobar.tunnel.host.net`, obtain a certificate if needed
 and proxy traffic to the proxy file. You can then access your service publicly:
 
     curl https://foobar.tunnel.host.net
@@ -25,15 +25,17 @@ in `/run/henk` to instantly make them reachable over HTTPS.
 
 - Build henk with `go build`.
 - Place the binary at `/usr/bin/henk`.
-- Create a henk user and group.
+- Create a `henk` user and group.
 - Place the service file at `/etc/systemd/system/henk.service`.
 - Edit it to set the desired base domain.
-- Set DNS to forward all subdomains for that base domain to your server.
-- Set sshd to disallow login as henk. Reverse proxy options should still work.
-- Authorize desired SSH keys for user henk.
-- Set sshd to clean up old sockets before creating new ones:
+- Set DNS to forward all subdomains for the base domain to your server.
+- Set `sshd` to disallow login as `henk`. Reverse proxy options should still work.
+- Authorize desired SSH keys for user `henk`.
+- Set `sshd` to clean up old sockets before creating new ones:
 
-      echo 'StreamLocalBindUnlink yes' >> /etc/ssh/sshd_config
+      echo StreamLocalBindUnlink yes >> /etc/ssh/sshd_config
+
+- Restart `sshd` and start the henk service.
 
 ### Security model
 
@@ -44,13 +46,12 @@ specify who is allowed to use henk.
 Henk relies on the Go autocert library to obtain Let's Encrypt certificates. It
 only obtains certificates for domains whose corresponding socket exists.
 
-Henk has about a 100 lines of Go glue code which is a fairly small attack
+Henk has about a hundred lines of Go glue code which is a fairly small attack
 surface, but it has not yet been thoroughly reviewed.
 
 Anyone with one of henk's authorized keys can use henk, host anything on any
-subdomain and steal subdomain proxies from others. This is a limitation of
-OpenSSH's reverse proxy feature. Make sure you only give access to people you
-trust and that trust each other.
+subdomain and steal subdomain proxies from others. Make sure you only give
+access to people you trust and that trust each other.
 
 ### FAQ
 
