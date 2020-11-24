@@ -1,4 +1,4 @@
-Henk is a very simple reverse HTTP proxy leveraging openSSH's built-in reverse
+Henk is a very simple reverse HTTP proxy leveraging OpenSSH's built-in reverse
 proxy features for authentication and secure tunneling and Let's Encrypt for
 adding HTTPS.
 
@@ -18,6 +18,9 @@ and proxy traffic to the proxy file. You can then access your service publicly:
 
     curl https://foobar.tunnel.host.net
 
+You can also tell HTTP backends running on the same host to listen on a socket
+in `/run/henk` to instantly make them reachable over HTTPS.
+
 ### Setup
 
 - Build henk with `go build`.
@@ -32,8 +35,43 @@ and proxy traffic to the proxy file. You can then access your service publicly:
 
       echo 'StreamLocalBindUnlink yes' >> /etc/ssh/sshd_config
 
-### Other uses
+### Security model
 
-Henk is only about a hundred lines of Go so it should be easy to adapt for other
-uses. One thing you can try is to host more permanent websites by having their
-backends create a socket in `/run/henk`.
+Henk relies on the security of OpenSSH to protect the data forwarded to and from
+your local HTTP service. It also relies on the authentication of OpenSSH to
+specify who is allowed to use henk.
+
+Henk relies on the Go autocert library to obtain Let's Encrypt certificates. It
+only obtains certificates for domains whose corresponding socket exists.
+
+Henk has about a 100 lines of Go glue code which is a fairly small attack
+surface, but it has not yet been thoroughly reviewed.
+
+Anyone with one of henk's authorized keys can use henk, host anything on any
+subdomain and steal subdomain proxies from others. This is a limitation of
+OpenSSH's reverse proxy feature. Make sure you only give access to people you
+trust and that trust each other.
+
+### FAQ
+
+#### Why do I need to connect as the same henk user?
+
+OpenSSH creates the reverse proxy socket with the connecting user as owner and
+no permissions for group or other. If you connect as another user, the henk
+daemon won't be able to access the socket.
+
+#### Why does OpenSSH fail to set up the reverse proxy?
+
+Unfortunately, the error messages from OpenSSH aren't very clear. It could be
+one of these things:
+
+- You're using SSH connection sharing or `ControlMaster` options: The proxy can
+  only be set up by the master connection. Consider just disabling that option
+  for this host.
+- OpenSSH does not have permission to create the socket: Check the ownership and
+  permission bits of `/run/henk` and make sure you connect to the same user that
+  runs the henk daemon.
+- The path you specified for the socket still exists: Make sure to add
+  `StreamLocalBindUnlink yes` to `/etc/ssh/sshd_config` and restart SSHD. Check
+  that the henk user has permission to remove the old socket or remove it
+  manually.
